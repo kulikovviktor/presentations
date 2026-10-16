@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+Паспорт презентации
+Название: Как работает современный ИИ — просто
+Собрано: Grok 4.7 (grok-4.7)
+Дата: 2026-10-16
+Версия: 1.0.0
+-->
+<title>Как работает современный ИИ — просто</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --text: #222;
+    --accent: #1a3a6b;
+    --highlight: #e8f0fe;
+    --btn: #1a3a6b;
+    --btn-hover: #0d2a50;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a2e;
+      --text: #eee;
+      --accent: #7aa2f7;
+      --highlight: #2a2a4a;
+      --btn: #7aa2f7;
+      --btn-hover: #5a82d7;
+    }
+  }
+  body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--text); }
+  .slide { min-height: 100vh; padding: 40px 40px 80px; box-sizing: border-box; display: none; }
+  .slide.active { display: block; }
+  h1 { font-size: 2.4em; color: var(--accent); margin-bottom: 10px; }
+  h2 { font-size: 2em; color: var(--accent); }
+  p, li { font-size: 1.3em; line-height: 1.6; }
+  svg { max-width: 100%; height: auto; margin: 20px auto; display: block; }
+  .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; }
+  button { padding: 10px 20px; font-size: 1em; background: var(--btn); color: white; border: none; border-radius: 8px; cursor: pointer; }
+  button:hover { background: var(--btn-hover); }
+  .highlight { background: var(--highlight); padding: 15px; border-radius: 10px; margin: 15px 0; }
+  .counter { font-size: 0.9em; opacity: 0.8; }
+  @media (max-width: 500px) {
+    .slide { padding: 20px 20px 100px; }
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.5em; }
+    p, li { font-size: 1.1em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="slide active" id="s1">
+  <h1>Как работает современный ИИ</h1>
+  <h2>Простыми словами для тех, кто не из IT</h2>
+  <p>Вы хотите понять, что происходит внутри, когда вы задаёте вопрос ChatGPT, Grok или Claude?</p>
+  <p>Сейчас расскажем без сложных терминов.</p>
+</div>
+
+<div class="slide" id="s2">
+  <h2>Представьте большой офис</h2>
+  <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+    <rect x="50" y="50" width="500" height="200" fill="var(--highlight)" stroke="var(--accent)" stroke-width="2" rx="10"/>
+    <text x="300" y="80" text-anchor="middle" font-size="20" fill="var(--accent)">Большой офис</text>
+    <circle cx="150" cy="150" r="30" fill="#4a90e2"/>
+    <text x="150" y="155" text-anchor="middle" fill="white" font-size="12">Спец1</text>
+    <circle cx="250" cy="150" r="30" fill="#4a90e2"/>
+    <text x="250" y="155" text-anchor="middle" fill="white" font-size="12">Спец2</text>
+    <circle cx="350" cy="150" r="30" fill="#ccc"/>
+    <text x="350" y="155" text-anchor="middle" fill="#666" font-size="12">отдыхает</text>
+    <circle cx="450" cy="150" r="30" fill="#ccc"/>
+    <text x="450" y="155" text-anchor="middle" fill="#666" font-size="12">отдыхает</text>
+    <text x="300" y="220" text-anchor="middle" font-size="16" fill="var(--text)">Зовём только нужных</text>
+  </svg>
+  <p>Модель — это как огромный офис с сотнями сотрудников.</p>
+  <p>Когда приходит вопрос, не все сразу бегут работать. Есть человек, который смотрит на задачу и зовёт только нужных специалистов.</p>
+</div>
+
+<div class="slide" id="s3">
+  <h2>Текст превращается в карточки</h2>
+  <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="50" y="50" width="80" height="100" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" rx="5"/>
+    <text x="90" y="105" text-anchor="middle" font-size="14" fill="var(--text)">Привет</text>
+    <rect x="160" y="50" width="80" height="100" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" rx="5"/>
+    <text x="200" y="105" text-anchor="middle" font-size="14" fill="var(--text)">как</text>
+    <rect x="270" y="50" width="80" height="100" fill="var(--bg)" stroke="var(--accent)" stroke-width="2" rx="5"/>
+    <text x="310" y="105" text-anchor="middle" font-size="14" fill="var(--text)">дела</text>
+    <text x="400" y="110" font-size="16" fill="var(--text)">→ карточки с цифрами</text>
+  </svg>
+  <p>Ваш текст сначала режут на маленькие кусочки (токены) — примерно как слова или части слов.</p>
+  <p>Каждый кусочек превращают в карточку с цифрами и пометкой, на каком месте он стоял.</p>
+</div>
+
+<div class="slide" id="s4">
+  <h2>Смотрим, что важно</h2>
+  <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+    <text x="100" y="50" font-size="16" fill="var(--text)">слово1</text>
+    <text x="200" y="50" font-size="16" fill="var(--text)">слово2</text>
+    <text x="300" y="50" font-size="16" fill="var(--text)">слово3</text>
+    <text x="400" y="50" font-size="16" fill="var(--text)">слово4</text>
+    <path d="M120 70 Q200 150 280 70" fill="none" stroke="#4a90e2" stroke-width="3"/>
+    <path d="M220 70 Q300 180 380 70" fill="none" stroke="#e74c3c" stroke-width="3"/>
+    <text x="300" y="200" text-anchor="middle" font-size="16" fill="var(--text)">Attention: смотрим на важные слова</text>
+  </svg>
+  <p>Это называется attention — «внимание».</p>
+  <p>Модель оглядывается на предыдущие слова и решает, какие из них сейчас самые важные. Как когда вы пишете и вспоминаете, о чём речь.</p>
+</div>
+
+<div class="slide" id="s5">
+  <h2>Зовём только нужных</h2>
+  <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+    <rect x="50" y="50" width="100" height="60" fill="#4a90e2" rx="5"/>
+    <text x="100" y="85" text-anchor="middle" fill="white">Счётчик</text>
+    <rect x="200" y="50" width="100" height="60" fill="#4a90e2" rx="5"/>
+    <text x="250" y="85" text-anchor="middle" fill="white">Знаток</text>
+    <rect x="350" y="50" width="100" height="60" fill="#ccc" rx="5"/>
+    <text x="400" y="85" text-anchor="middle" fill="#666">отдыхает</text>
+    <text x="300" y="180" text-anchor="middle" font-size="16" fill="var(--text)">Только активные специалисты работают</text>
+  </svg>
+  <div class="highlight">
+    <p>Вместо того чтобы гонять всю огромную модель на каждый кусочек текста, она вызывает только несколько специалистов из сотен.</p>
+    <p>Один хорошо считает, другой знает факты, третий хорошо формулирует. Остальные отдыхают.</p>
+  </div>
+  <p>Поэтому модель может быть очень умной, но отвечать относительно быстро.</p>
+</div>
+
+<div class="slide" id="s6">
+  <h2>Как она учится</h2>
+  <p>Сначала модель читает огромное количество текста и учится предсказывать следующее слово.</p>
+  <p>Потом её учат отвечать полезно, следовать инструкциям и думать шаг за шагом.</p>
+  <p>Это как сначала научить человека читать много книг, а потом — отвечать на вопросы и решать задачи.</p>
+</div>
+
+<div class="slide" id="s7">
+  <h2>Итог</h2>
+  <p>Современный ИИ — это большая команда специалистов, которая:</p>
+  <ul>
+    <li>смотрит на важные части вашего текста</li>
+    <li>вызывает только нужных людей из большой команды</li>
+    <li>предсказывает ответ кусочек за кусочком</li>
+  </ul>
+  <p>Всё остальное — детали. Главное — она не считает всё сразу, а работает выборочно.</p>
+</div>
+
+<div class="nav">
+  <button onclick="prev()">Назад</button>
+  <span class="counter" id="counter">1 / 7</span>
+  <button onclick="next()">Дальше</button>
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const counter = document.getElementById('counter');
+function show(n) {
+  slides.forEach(s => s.classList.remove('active'));
+  slides[n].classList.add('active');
+  current = n;
+  counter.textContent = (n + 1) + ' / ' + slides.length;
+}
+function next() { if (current < slides.length - 1) show(current + 1); }
+function prev() { if (current > 0) show(current - 1); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') next();
+  if (e.key === 'ArrowLeft') prev();
+});
+show(0);
+</script>
+</body>
+</html>
