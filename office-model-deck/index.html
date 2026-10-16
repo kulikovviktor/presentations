@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Как устроена современная языковая модель: аналогия с офисом, который пишет ответы. 15 слайдов со схемами для людей вне IT.">
+<!--
+  Паспорт презентации
+  Название: Офис, который пишет ответы
+  Собрано: Claude Fable 5.1 (claude-fable-5-1) в приложении Claude, по запросу Виктора (@kulikovviktor)
+  Дата: 2026-10-16
+  Версия: 1.0.0
+  Подробности и changelog: README.md рядом с этим файлом
+-->
+<title>Офис, который пишет ответы</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: vertical slide deck with scroll snap; each slide = short text + one diagram. Office/index-card visual language. */
+:root{
+  --bg:#EDF0F5; --surface:#FFFFFF; --fg:#1B2130; --muted:#5B6578; --line:#C7CFDC;
+  --room:#DDE4EF; --accent:#F0A93A; --accent-ink:#4A2E00; --hot:#D8573F; --cool:#2B8F82;
+  --font-display:'Unbounded','Arial Black',Impact,sans-serif;
+  --font-body:'Golos Text','Segoe UI',Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131826; --surface:#1D2434; --fg:#EDF1F7; --muted:#A1ACBE; --line:#3A4560;
+    --room:#273146; --accent:#F4B85A; --accent-ink:#2A1A00; --hot:#F27A62; --cool:#4DBBAA;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131826; --surface:#1D2434; --fg:#EDF1F7; --muted:#A1ACBE; --line:#3A4560;
+  --room:#273146; --accent:#F4B85A; --accent-ink:#2A1A00; --hot:#F27A62; --cool:#4DBBAA;
+  color-scheme:dark;
+}
+html{height:100%;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--font-body);line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+.deck{height:100%;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y proximity;scroll-behavior:smooth;overscroll-behavior:contain}
+@media (prefers-reduced-motion: reduce){.deck{scroll-behavior:auto}}
+
+.slide{
+  min-height:100%;scroll-snap-align:start;display:grid;place-items:center;
+  padding-block:40px calc(84px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  border-bottom:1px solid var(--line);
+}
+.slide:last-child{border-bottom:0}
+.inner{width:100%;max-width:960px;display:grid;gap:22px;align-items:center;min-width:0}
+@media (min-width:860px){.inner{grid-template-columns:320px 1fr;gap:40px}}
+.copy{min-width:0;display:grid;gap:12px}
+.figure{min-width:0}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--hot);font-weight:600}
+h1,h2{font-family:var(--font-display);font-weight:700;line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.7rem,5.5vw,2.8rem)}
+h2{font-size:clamp(1.25rem,3.6vw,1.9rem)}
+p{margin:0;font-size:1.02rem;max-width:60ch}
+.note{font-size:.92rem;color:var(--muted);border-left:3px solid var(--accent);padding-left:12px}
+.hint{font-size:.9rem;color:var(--muted)}
+.title .inner{grid-template-columns:1fr;text-align:left;max-width:760px}
+
+/* diagrams */
+.sv{width:100%;height:auto;display:block;font-family:var(--font-body);max-width:100%}
+.sv text{fill:var(--fg);font-size:18px}
+.sv .t-s{font-size:15px}
+.sv .t-l{font-size:22px;font-weight:600}
+.sv .b{font-weight:600}
+.sv .mu{fill:var(--muted)}
+.sv .on-hot{fill:var(--accent-ink)}
+.sv .wh{fill:#FFFFFF;font-weight:700}
+.sv .card{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.sv .card-hot{fill:var(--accent);stroke:var(--accent);stroke-width:1.5}
+.sv .card-ghost{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:6 5}
+.sv .room{fill:var(--room);stroke:var(--line);stroke-width:1.5}
+.sv .ln{stroke:var(--line);stroke-width:1.5;fill:none}
+.sv .cut{stroke:var(--hot);stroke-width:2;stroke-dasharray:6 5;fill:none}
+.sv .arrow{stroke:var(--muted);stroke-width:2;fill:none;marker-end:url(#ah)}
+.sv .arrow.hot{stroke:var(--hot);marker-end:url(#ahh)}
+.sv .arrow.dash{stroke-dasharray:6 5}
+.sv .arc{stroke:var(--hot);fill:none;opacity:.85;stroke-linecap:round}
+.sv .person{color:var(--line)}
+.sv .person.on{color:var(--cool)}
+.sv .person.router{color:var(--hot)}
+.sv .badge{fill:var(--hot)}
+.sv .sticky{fill:var(--accent)}
+.sv .sticky.c{fill:var(--cool)}
+.sv .sticky.h{fill:var(--hot)}
+.sv .bar{fill:var(--line)}
+.sv .bar.on{fill:var(--accent)}
+.sv .cell{fill:var(--line)}
+.sv .cell.on{fill:var(--cool)}
+.sv .fill-line{fill:var(--line)}
+.sv .fill-mu{fill:var(--muted)}
+.sv .check{stroke:var(--cool);stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sv .cross{stroke:var(--muted);stroke-width:3;fill:none;stroke-linecap:round}
+#ah path{fill:var(--muted)}
+#ahh path{fill:var(--hot)}
+
+/* limits cards */
+.limits{display:grid;gap:14px}
+@media (min-width:640px){.limits{grid-template-columns:repeat(3,1fr)}}
+.lim{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;min-width:0}
+.lim svg{width:56px;height:56px;display:block}
+.lim b{font-weight:600;display:block}
+.lim span{font-size:.95rem;color:var(--muted)}
+
+.sources{font-size:.88rem;color:var(--muted);display:grid;gap:4px;margin:0;padding-left:1.1em}
+.sources a{color:var(--cool)}
+
+/* controls */
+.progress{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:4px;background:var(--line);z-index:11}
+.progress i{display:block;height:100%;width:0;background:var(--hot);transition:width .25s}
+.nav{position:fixed;z-index:11;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.nav button{appearance:none;border:0;background:var(--room);color:var(--fg);width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:grid;place-items:center}
+.nav button:hover{background:var(--line)}
+.nav button:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+.nav button[disabled]{opacity:.35;cursor:default}
+.nav .count{font-variant-numeric:tabular-nums;font-size:.95rem;color:var(--muted);min-width:4.5ch;text-align:center}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker>
+    <symbol id="person" overflow="visible">
+      <circle cx="0" cy="-16" r="9" fill="currentColor"/>
+      <path d="M-14 26 V8 a14 14 0 0 1 28 0 V26 Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+<main class="deck" id="deck" lang="ru">
+
+<!-- 1 -->
+<section class="slide title" id="s1">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Понятное объяснение для тех, кто далёк от IT</div>
+      <h1>Офис, который пишет ответы</h1>
+      <p>Как устроена современная языковая модель, если представить её большой командой людей в офисе. Пятнадцать картинок, без формул и терминов.</p>
+      <p class="hint">Листайте вниз, стрелками на клавиатуре или кнопками внизу.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 320" role="img" aria-label="Здание офиса: слева входит карточка с вопросом, справа выходит карточка с ответом">
+        <line x1="0" y1="290" x2="600" y2="290" class="ln"/>
+        <rect x="170" y="42" width="260" height="248" rx="6" class="room"/>
+        <rect x="245" y="16" width="110" height="30" rx="6" class="card-hot"/>
+        <text x="300" y="37" text-anchor="middle" class="t-s on-hot b">ОФИС</text>
+        <rect x="190" y="62" width="36" height="30" rx="3" class="sticky"/>
+        <rect x="238" y="62" width="36" height="30" rx="3" class="card"/>
+        <rect x="286" y="62" width="36" height="30" rx="3" class="card"/>
+        <rect x="334" y="62" width="36" height="30" rx="3" class="sticky"/>
+        <rect x="382" y="62" width="36" height="30" rx="3" class="card"/>
+        <rect x="190" y="110" width="36" height="30" rx="3" class="card"/>
+        <rect x="238" y="110" width="36" height="30" rx="3" class="card"/>
+        <rect x="286" y="110" width="36" height="30" rx="3" class="sticky"/>
+        <rect x="334" y="110" width="36" height="30" rx="3" class="card"/>
+        <rect x="382" y="110" width="36" height="30" rx="3" class="card"/>
+        <rect x="190" y="158" width="36" height="30" rx="3" class="card"/>
+        <rect x="238" y="158" width="36" height="30" rx="3" class="sticky"/>
+        <rect x="286" y="158" width="36" height="30" rx="3" class="card"/>
+        <rect x="334" y="158" width="36" height="30" rx="3" class="card"/>
+        <rect x="382" y="158" width="36" height="30" rx="3" class="sticky"/>
+        <rect x="282" y="236" width="36" height="54" rx="3" class="fill-mu"/>
+        <rect x="30" y="200" width="100" height="60" rx="8" class="card"/>
+        <text x="80" y="236" text-anchor="middle">вопрос</text>
+        <path d="M134,230 L166,230" class="arrow"/>
+        <rect x="470" y="200" width="100" height="60" rx="8" class="card-hot"/>
+        <text x="520" y="236" text-anchor="middle" class="on-hot b">ответ</text>
+        <path d="M434,230 L466,230" class="arrow"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s2">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">С чего начать</div>
+      <h2>Модель дописывает текст</h2>
+      <p>Внутри нет готовых ответов. Модель получает начало текста и добавляет к нему следующий маленький кусочек. Потом ещё один. Так, кусочек за кусочком, появляется весь ответ.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 240" role="img" aria-label="Строка из кусочков: три уже написаны, четвёртый только что добавлен, пятый ещё пустой">
+        <text x="159" y="66" text-anchor="middle" class="t-s mu">уже написано</text>
+        <line x1="20" y1="76" x2="298" y2="76" class="ln"/>
+        <text x="351" y="66" text-anchor="middle" class="t-s mu">добавили</text>
+        <line x1="308" y1="76" x2="394" y2="76" class="ln"/>
+        <text x="447" y="66" text-anchor="middle" class="t-s mu">дальше</text>
+        <line x1="404" y1="76" x2="490" y2="76" class="ln"/>
+        <rect x="20" y="90" width="86" height="56" rx="8" class="card"/>
+        <text x="63" y="124" text-anchor="middle">Столица</text>
+        <rect x="116" y="90" width="86" height="56" rx="8" class="card"/>
+        <text x="159" y="124" text-anchor="middle">Франции</text>
+        <rect x="212" y="90" width="86" height="56" rx="8" class="card"/>
+        <text x="255" y="124" text-anchor="middle">это</text>
+        <rect x="308" y="90" width="86" height="56" rx="8" class="card-hot"/>
+        <text x="351" y="124" text-anchor="middle" class="on-hot b">Париж</text>
+        <rect x="404" y="90" width="86" height="56" rx="8" class="card-ghost"/>
+        <text x="447" y="125" text-anchor="middle" class="mu t-l">?</text>
+        <rect x="500" y="90" width="86" height="56" rx="8" class="card-ghost" opacity=".45"/>
+        <path d="M351,160 Q399,210 447,160" class="arrow hot"/>
+        <text x="300" y="228" text-anchor="middle" class="t-s mu">по одному кусочку за раз, пока ответ не закончится</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s3">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Аналогия</div>
+      <h2>Представим большой офис</h2>
+      <p>В офисе четыре места. В приёмной текст режут на карточки. В коридоре с комнатами карточки обрабатывают. На выходе выбирают следующий кусочек. В архиве хранят всё, что уже обработано. Пройдём по этим местам по порядку.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 350" role="img" aria-label="План офиса: приёмная, коридор с комнатами, выход и архив, соединённые стрелками">
+        <rect x="20" y="60" width="130" height="130" rx="8" class="room"/>
+        <circle cx="36" cy="76" r="14" class="badge"/><text x="36" y="81" text-anchor="middle" class="t-s wh">1</text>
+        <rect x="40" y="104" width="28" height="22" rx="3" class="card"/>
+        <rect x="76" y="104" width="28" height="22" rx="3" class="card"/>
+        <rect x="112" y="104" width="28" height="22" rx="3" class="card"/>
+        <text x="85" y="176" text-anchor="middle" class="t-s b">Приёмная</text>
+
+        <rect x="170" y="60" width="300" height="130" rx="8" class="room"/>
+        <circle cx="186" cy="76" r="14" class="badge"/><text x="186" y="81" text-anchor="middle" class="t-s wh">2</text>
+        <rect x="200" y="95" width="40" height="50" rx="4" class="card"/>
+        <rect x="248" y="95" width="40" height="50" rx="4" class="card"/>
+        <rect x="296" y="95" width="40" height="50" rx="4" class="card"/>
+        <rect x="344" y="95" width="40" height="50" rx="4" class="card"/>
+        <text x="404" y="128" text-anchor="middle" class="t-l mu">…</text>
+        <rect x="420" y="95" width="40" height="50" rx="4" class="card"/>
+        <text x="320" y="176" text-anchor="middle" class="t-s b">Коридор с комнатами</text>
+
+        <rect x="490" y="60" width="90" height="130" rx="8" class="room"/>
+        <circle cx="506" cy="76" r="14" class="badge"/><text x="506" y="81" text-anchor="middle" class="t-s wh">3</text>
+        <use href="#person" x="540" y="122" class="person on"/>
+        <text x="535" y="176" text-anchor="middle" class="t-s b">Выход</text>
+
+        <rect x="170" y="230" width="300" height="100" rx="8" class="room"/>
+        <circle cx="186" cy="246" r="14" class="badge"/><text x="186" y="251" text-anchor="middle" class="t-s wh">4</text>
+        <line x1="210" y1="276" x2="450" y2="276" class="ln"/>
+        <line x1="210" y1="306" x2="450" y2="306" class="ln"/>
+        <rect x="216" y="256" width="24" height="18" rx="2" class="card"/>
+        <rect x="246" y="256" width="24" height="18" rx="2" class="card"/>
+        <rect x="276" y="256" width="24" height="18" rx="2" class="card"/>
+        <rect x="306" y="256" width="24" height="18" rx="2" class="card"/>
+        <rect x="216" y="286" width="24" height="18" rx="2" class="card"/>
+        <rect x="246" y="286" width="24" height="18" rx="2" class="card"/>
+        <text x="390" y="320" text-anchor="middle" class="t-s b">Архив</text>
+
+        <path d="M152,125 L166,125" class="arrow"/>
+        <path d="M472,125 L486,125" class="arrow"/>
+        <path d="M535,192 V280 H474" class="arrow"/>
+        <path d="M320,228 V194" class="arrow dash"/>
+        <text x="330" y="214" class="t-s mu">смотреть назад</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide" id="s4">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Место 1 · Приёмная</div>
+      <h2>Текст режут на карточки</h2>
+      <p>Текст делят на кусочки, примерно по слову или части слова. Каждый кусочек превращают в карточку. На карточке два поля: набор чисел, который описывает кусочек, и номер его места в тексте.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 300" role="img" aria-label="Предложение разрезано на четыре карточки, на каждой слово, ряд чисел и номер места">
+        <rect x="40" y="20" width="520" height="60" rx="8" class="card"/>
+        <text x="110" y="58" text-anchor="middle" class="t-l">Кот</text>
+        <text x="215" y="58" text-anchor="middle" class="t-l">сидел</text>
+        <text x="330" y="58" text-anchor="middle" class="t-l">на</text>
+        <text x="470" y="58" text-anchor="middle" class="t-l">окне</text>
+        <line x1="162" y1="12" x2="162" y2="88" class="cut"/>
+        <line x1="272" y1="12" x2="272" y2="88" class="cut"/>
+        <line x1="400" y1="12" x2="400" y2="88" class="cut"/>
+        <path d="M300,90 V118" class="arrow"/>
+
+        <rect x="40" y="130" width="120" height="100" rx="8" class="card"/>
+        <text x="100" y="172" text-anchor="middle" class="t-l">Кот</text>
+        <text x="100" y="196" text-anchor="middle" class="t-s mu">0.2 −1.4 0.7 …</text>
+        <rect x="118" y="138" width="34" height="20" rx="10" class="card-hot"/>
+        <text x="135" y="153" text-anchor="middle" class="t-s on-hot b">№1</text>
+
+        <rect x="175" y="130" width="120" height="100" rx="8" class="card"/>
+        <text x="235" y="172" text-anchor="middle" class="t-l">сидел</text>
+        <text x="235" y="196" text-anchor="middle" class="t-s mu">1.1 0.3 −0.8 …</text>
+        <rect x="253" y="138" width="34" height="20" rx="10" class="card-hot"/>
+        <text x="270" y="153" text-anchor="middle" class="t-s on-hot b">№2</text>
+
+        <rect x="310" y="130" width="120" height="100" rx="8" class="card"/>
+        <text x="370" y="172" text-anchor="middle" class="t-l">на</text>
+        <text x="370" y="196" text-anchor="middle" class="t-s mu">−0.5 0.9 0.1 …</text>
+        <rect x="388" y="138" width="34" height="20" rx="10" class="card-hot"/>
+        <text x="405" y="153" text-anchor="middle" class="t-s on-hot b">№3</text>
+
+        <rect x="445" y="130" width="120" height="100" rx="8" class="card"/>
+        <text x="505" y="172" text-anchor="middle" class="t-l">окне</text>
+        <text x="505" y="196" text-anchor="middle" class="t-s mu">0.4 −0.2 1.6 …</text>
+        <rect x="523" y="138" width="34" height="20" rx="10" class="card-hot"/>
+        <text x="540" y="153" text-anchor="middle" class="t-s on-hot b">№4</text>
+
+        <text x="300" y="272" text-anchor="middle" class="t-s mu">Длинное слово режут на части: подоконник → подо · кон · ник</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s5">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Место 2 · Коридор</div>
+      <h2>Много комнат, в каждой свои люди</h2>
+      <p>Карточки идут по длинному коридору. Комнат десятки. В каждой комнате делают три одинаковых действия по очереди. Разберём их на трёх следующих картинках.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 360" role="img" aria-label="Коридор с пронумерованными комнатами и выноска: в каждой комнате три действия">
+        <rect x="30" y="20" width="60" height="40" rx="6" class="card"/>
+        <rect x="100" y="20" width="60" height="40" rx="6" class="card"/>
+        <rect x="170" y="20" width="60" height="40" rx="6" class="card-hot"/>
+        <text x="250" y="46" class="t-s mu">карточки идут по коридору</text>
+        <rect x="20" y="80" width="560" height="100" rx="8" class="room"/>
+        <rect x="32" y="95" width="58" height="70" rx="6" class="card"/>
+        <text x="61" y="137" text-anchor="middle" class="b">1</text>
+        <rect x="102" y="95" width="58" height="70" rx="6" class="card"/>
+        <text x="131" y="137" text-anchor="middle" class="b">2</text>
+        <rect x="172" y="95" width="58" height="70" rx="6" class="card"/>
+        <text x="201" y="137" text-anchor="middle" class="b">3</text>
+        <rect x="242" y="95" width="58" height="70" rx="6" class="card"/>
+        <text x="271" y="137" text-anchor="middle" class="b">4</text>
+        <text x="335" y="137" text-anchor="middle" class="t-l mu">…</text>
+        <rect x="372" y="95" width="58" height="70" rx="6" class="card"/>
+        <text x="401" y="137" text-anchor="middle" class="b">59</text>
+        <rect x="442" y="95" width="58" height="70" rx="6" class="card"/>
+        <text x="471" y="137" text-anchor="middle" class="b">60</text>
+        <path d="M512,130 L562,130" class="arrow"/>
+        <path d="M131,167 V210" class="arrow dash"/>
+        <rect x="20" y="212" width="560" height="136" rx="8" class="card"/>
+        <text x="40" y="240" class="t-s mu">В каждой комнате, по очереди:</text>
+        <circle cx="48" cy="270" r="12" class="badge"/><text x="48" y="275" text-anchor="middle" class="t-s wh">А</text>
+        <text x="70" y="276" class="b">Смотрим назад</text>
+        <circle cx="48" cy="302" r="12" class="badge"/><text x="48" y="307" text-anchor="middle" class="t-s wh">Б</text>
+        <text x="70" y="308" class="b">Зовём специалистов</text>
+        <circle cx="48" cy="334" r="12" class="badge"/><text x="48" y="339" text-anchor="middle" class="t-s wh">В</text>
+        <text x="70" y="340" class="b">Дописываем пометки</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="s6">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Действие А</div>
+      <h2>Смотрим назад</h2>
+      <p>Новая карточка сверяется с каждой предыдущей и решает, насколько та важна прямо сейчас. Важная карточка получает много внимания, неважная совсем чуть-чуть. Учитываются все, в разной степени. Это как при письме оглянуться: про кого я говорил, какое слово было ключевым.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 305" role="img" aria-label="Карточка со словом он смотрит назад на предыдущие слова; самая толстая линия идёт к слову Пете">
+        <path d="M546,196 Q300,34 54,196" class="arc" stroke-width="4"/>
+        <path d="M546,196 Q341,61 136,196" class="arc" stroke-width="1.5"/>
+        <path d="M546,196 Q382,88 218,196" class="arc" stroke-width="7.5"/>
+        <path d="M546,196 Q423,115 300,196" class="arc" stroke-width="2.2"/>
+        <path d="M546,196 Q464,142 382,196" class="arc" stroke-width="1.3"/>
+        <path d="M546,196 Q505,169 464,196" class="arc" stroke-width="1"/>
+
+        <rect x="16" y="200" width="76" height="56" rx="8" class="card"/>
+        <text x="54" y="228" text-anchor="middle">Маша</text>
+        <text x="54" y="248" text-anchor="middle" class="t-s mu">25 %</text>
+        <rect x="98" y="200" width="76" height="56" rx="8" class="card"/>
+        <text x="136" y="228" text-anchor="middle">дала</text>
+        <text x="136" y="248" text-anchor="middle" class="t-s mu">5 %</text>
+        <rect x="180" y="200" width="76" height="56" rx="8" class="card"/>
+        <text x="218" y="228" text-anchor="middle" class="b">Пете</text>
+        <text x="218" y="248" text-anchor="middle" class="t-s b">55 %</text>
+        <rect x="262" y="200" width="76" height="56" rx="8" class="card"/>
+        <text x="300" y="228" text-anchor="middle">яблоко</text>
+        <text x="300" y="248" text-anchor="middle" class="t-s mu">8 %</text>
+        <rect x="344" y="200" width="76" height="56" rx="8" class="card"/>
+        <text x="382" y="228" text-anchor="middle">потому</text>
+        <text x="382" y="248" text-anchor="middle" class="t-s mu">4 %</text>
+        <rect x="426" y="200" width="76" height="56" rx="8" class="card"/>
+        <text x="464" y="228" text-anchor="middle">что</text>
+        <text x="464" y="248" text-anchor="middle" class="t-s mu">3 %</text>
+        <rect x="508" y="200" width="76" height="56" rx="8" class="card-hot"/>
+        <text x="546" y="234" text-anchor="middle" class="on-hot b">он</text>
+        <text x="546" y="276" text-anchor="middle" class="t-s b">новая карточка</text>
+        <text x="260" y="296" text-anchor="middle" class="t-s mu">Толщина линии: сколько внимания получает карточка. В сумме 100 %.</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s7">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Действие Б</div>
+      <h2>Зовём специалистов</h2>
+      <p>В комнате много специалистов, у каждого свой способ работать с карточкой. На входе сидит распределитель. Он смотрит на карточку и зовёт нескольких человек, остальные эту карточку пропускают. Кого звать, распределитель выучил на опыте.</p>
+      <p class="note">Специалисты различаются способом обработки. По темам, как врач и бухгалтер, они себя не делят: исследователи проверяли и такого деления не нашли.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 320" role="img" aria-label="Карточка приходит к распределителю, он зовёт двух специалистов из восьми, остальные шесть пропускают карточку">
+        <rect x="20" y="140" width="96" height="60" rx="8" class="card"/>
+        <text x="68" y="176" text-anchor="middle" class="t-s">карточка</text>
+        <path d="M120,170 L160,170" class="arrow"/>
+        <use href="#person" x="190" y="160" class="person router"/>
+        <text x="190" y="215" text-anchor="middle" class="t-s">распределитель</text>
+        <text x="435" y="44" text-anchor="middle" class="t-s mu">специалисты комнаты</text>
+        <path d="M206,156 L388,102" class="arrow hot"/>
+        <path d="M206,172 L458,228" class="arrow hot"/>
+        <use href="#person" x="330" y="110" class="person"/>
+        <use href="#person" x="400" y="110" class="person on"/>
+        <use href="#person" x="470" y="110" class="person"/>
+        <use href="#person" x="540" y="110" class="person"/>
+        <use href="#person" x="330" y="240" class="person"/>
+        <use href="#person" x="400" y="240" class="person"/>
+        <use href="#person" x="470" y="240" class="person on"/>
+        <use href="#person" x="540" y="240" class="person"/>
+        <rect x="20" y="290" width="16" height="16" rx="3" class="cell on"/>
+        <text x="44" y="303" class="t-s">работают над этой карточкой</text>
+        <rect x="300" y="290" width="16" height="16" rx="3" class="cell"/>
+        <text x="324" y="303" class="t-s">эту карточку пропускают</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="s8">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Действие В</div>
+      <h2>Дописываем пометки</h2>
+      <p>Комната не стирает карточку и не переписывает её заново. Она добавляет свои пометки поверх прежних. К концу коридора на карточке собрано всё, что поняла каждая комната по пути.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 270" role="img" aria-label="Одна и та же карточка после приёмной, после комнаты 1, 10 и 60: пометок становится всё больше">
+        <text x="80" y="40" text-anchor="middle" class="t-s mu">приёмная</text>
+        <text x="225" y="40" text-anchor="middle" class="t-s mu">комната 1</text>
+        <text x="370" y="40" text-anchor="middle" class="t-s mu">комната 10</text>
+        <text x="515" y="40" text-anchor="middle" class="t-s mu">комната 60</text>
+
+        <rect x="20" y="55" width="120" height="150" rx="8" class="card"/>
+        <text x="80" y="85" text-anchor="middle" class="t-l">окне</text>
+        <text x="80" y="108" text-anchor="middle" class="t-s mu">0.4 −0.2 1.6 …</text>
+
+        <rect x="165" y="55" width="120" height="150" rx="8" class="card"/>
+        <text x="225" y="85" text-anchor="middle" class="t-l">окне</text>
+        <text x="225" y="108" text-anchor="middle" class="t-s mu">0.4 −0.2 1.6 …</text>
+        <rect x="179" y="125" width="34" height="22" rx="3" class="sticky"/>
+
+        <rect x="310" y="55" width="120" height="150" rx="8" class="card"/>
+        <text x="370" y="85" text-anchor="middle" class="t-l">окне</text>
+        <text x="370" y="108" text-anchor="middle" class="t-s mu">0.4 −0.2 1.6 …</text>
+        <rect x="324" y="125" width="34" height="22" rx="3" class="sticky"/>
+        <rect x="362" y="131" width="34" height="22" rx="3" class="sticky c"/>
+        <rect x="340" y="160" width="34" height="22" rx="3" class="sticky h"/>
+
+        <rect x="455" y="55" width="120" height="150" rx="8" class="card"/>
+        <text x="515" y="85" text-anchor="middle" class="t-l">окне</text>
+        <text x="515" y="108" text-anchor="middle" class="t-s mu">0.4 −0.2 1.6 …</text>
+        <rect x="469" y="122" width="34" height="22" rx="3" class="sticky"/>
+        <rect x="507" y="128" width="34" height="22" rx="3" class="sticky c"/>
+        <rect x="485" y="156" width="34" height="22" rx="3" class="sticky h"/>
+        <rect x="525" y="162" width="34" height="22" rx="3" class="sticky"/>
+        <rect x="467" y="180" width="34" height="22" rx="3" class="sticky c"/>
+        <rect x="511" y="184" width="34" height="22" rx="3" class="sticky h"/>
+        <rect x="535" y="140" width="34" height="22" rx="3" class="sticky c"/>
+
+        <path d="M142,130 L162,130" class="arrow"/>
+        <path d="M287,130 L307,130" class="arrow"/>
+        <path d="M432,130 L452,130" class="arrow"/>
+        <text x="300" y="248" text-anchor="middle" class="t-s mu">Прежние пометки остаются, новые ложатся поверх</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s9">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Место 3 · Выход</div>
+      <h2>Список кандидатов</h2>
+      <p>На выходе сидит человек. Он смотрит на итоговые пометки и составляет список: какой кусочек может идти следующим и насколько он вероятен. Из списка выбирают один и дописывают его к тексту. Поэтому на один и тот же вопрос офис иногда отвечает немного по-разному.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 300" role="img" aria-label="Список кандидатов на следующий кусочек с полосами вероятности: Париж 91 процент, остальные по несколько процентов">
+        <rect x="20" y="16" width="560" height="44" rx="8" class="card"/>
+        <text x="40" y="44">Текст пока: Столица Франции это …</text>
+        <rect x="394" y="70" width="100" height="22" rx="11" class="card-hot"/>
+        <text x="444" y="86" text-anchor="middle" class="t-s on-hot b">выбрали</text>
+
+        <text x="20" y="110" class="b">Париж</text>
+        <rect x="130" y="92" width="364" height="24" rx="4" class="bar on"/>
+        <text x="502" y="110" class="b">91 %</text>
+
+        <text x="20" y="148">город</text>
+        <rect x="130" y="130" width="16" height="24" rx="4" class="bar"/>
+        <text x="154" y="148" class="mu">4 %</text>
+
+        <text x="20" y="186">Лион</text>
+        <rect x="130" y="168" width="8" height="24" rx="4" class="bar"/>
+        <text x="146" y="186" class="mu">2 %</text>
+
+        <text x="20" y="224">самый</text>
+        <rect x="130" y="206" width="4" height="24" rx="2" class="bar"/>
+        <text x="142" y="224" class="mu">1 %</text>
+
+        <text x="20" y="262">другие</text>
+        <rect x="130" y="244" width="8" height="24" rx="4" class="bar"/>
+        <text x="146" y="262" class="mu">2 %</text>
+
+        <text x="300" y="292" text-anchor="middle" class="t-s mu">Длина полосы: насколько кусочек вероятен. В сумме 100 %.</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="s10">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Место 4 · Архив</div>
+      <h2>Повтор и архив</h2>
+      <p>После каждого кусочка всё начинается заново. Старые карточки по коридору второй раз не гоняют: их пометки уже лежат в архиве. По комнатам идёт только новая карточка, а смотреть назад она может на весь архив.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 345" role="img" aria-label="Цикл: новая карточка идёт в коридор, на выходе выбирают кусочек, его дописывают к тексту и всё повторяется; архив хранит пометки прошлых карточек">
+        <rect x="20" y="110" width="140" height="70" rx="8" class="card-hot"/>
+        <text x="90" y="150" text-anchor="middle" class="t-s on-hot b">новая карточка</text>
+        <path d="M164,145 L206,145" class="arrow"/>
+
+        <rect x="210" y="100" width="200" height="90" rx="8" class="room"/>
+        <rect x="222" y="112" width="32" height="40" rx="4" class="card"/>
+        <rect x="262" y="112" width="32" height="40" rx="4" class="card"/>
+        <rect x="302" y="112" width="32" height="40" rx="4" class="card"/>
+        <rect x="342" y="112" width="32" height="40" rx="4" class="card"/>
+        <text x="390" y="140" text-anchor="middle" class="t-l mu">…</text>
+        <text x="310" y="178" text-anchor="middle" class="t-s mu">коридор</text>
+        <path d="M414,145 L446,145" class="arrow"/>
+
+        <rect x="450" y="110" width="130" height="70" rx="8" class="card"/>
+        <use href="#person" x="478" y="148" class="person on"/>
+        <text x="538" y="140" text-anchor="middle" class="t-s b">выход</text>
+        <text x="538" y="160" text-anchor="middle" class="t-s mu">выбор кусочка</text>
+
+        <path d="M515,184 V312 H90 V186" class="arrow hot"/>
+        <text x="300" y="334" text-anchor="middle" class="t-s mu">кусочек дописали к тексту, идём снова</text>
+
+        <rect x="210" y="215" width="200" height="75" rx="8" class="room"/>
+        <rect x="222" y="228" width="26" height="20" rx="2" class="card"/>
+        <rect x="254" y="228" width="26" height="20" rx="2" class="card"/>
+        <rect x="286" y="228" width="26" height="20" rx="2" class="card"/>
+        <rect x="318" y="228" width="26" height="20" rx="2" class="card"/>
+        <rect x="350" y="228" width="26" height="20" rx="2" class="card"/>
+        <text x="310" y="278" text-anchor="middle" class="t-s mu">архив: пометки прошлых карточек</text>
+        <path d="M250,192 V212" class="arrow dash"/>
+        <text x="242" y="207" text-anchor="end" class="t-s mu">в архив</text>
+        <path d="M370,213 V194" class="arrow dash"/>
+        <text x="378" y="207" class="t-s mu">смотреть назад</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="s11">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Почему это работает</div>
+      <h2>Сотрудников много, работают немногие</h2>
+      <p>В офисе очень много людей и много комнат, поэтому модель может знать много. Но над каждым кусочком в каждой комнате работают лишь несколько специалистов, поэтому ответ приходит быстро. Ниже цифры двух открытых моделей, устройство которых опубликовано.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 310" role="img" aria-label="Две сетки по сто квадратов: у Mixtral закрашено 28, у DeepSeek-V3 около 5 с половиной">
+        <text x="128" y="44" text-anchor="middle" class="t-l">Mixtral 8x7B</text>
+        <text x="448" y="44" text-anchor="middle" class="t-l">DeepSeek-V3</text>
+        <g id="g-mixtral" transform="translate(40,66)"></g>
+        <g id="g-deepseek" transform="translate(360,66)"></g>
+        <text x="128" y="276" text-anchor="middle" class="b">13 из 47 млрд · 28 %</text>
+        <text x="448" y="276" text-anchor="middle" class="b">37 из 671 млрд · 5,5 %</text>
+        <text x="128" y="298" text-anchor="middle" class="t-s mu">работают над одним кусочком</text>
+        <text x="448" y="298" text-anchor="middle" class="t-s mu">работают над одним кусочком</text>
+      </svg>
+      <p class="hint" style="margin-top:8px">Каждый квадрат — один процент настраиваемых чисел модели. Цветные участвуют в обработке одного кусочка, серые его пропускают.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" id="s12">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Оговорка</div>
+      <h2>Не все офисы такие</h2>
+      <p>Бывают офисы без распределителя: там над каждой карточкой работают все сотрудники. Такие модели называют плотными. Офисы с распределителем называют смесью экспертов. Как устроены закрытые модели Anthropic, OpenAI и Google, компании не раскрывают, поэтому про них это утверждать нельзя.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 300" role="img" aria-label="Две комнаты: в плотной модели работают все восемь человек, в модели с распределителем работают двое из восьми">
+        <text x="155" y="32" text-anchor="middle" class="t-l">Плотная модель</text>
+        <rect x="20" y="50" width="270" height="230" rx="8" class="room"/>
+        <use href="#person" x="60" y="120" class="person on"/>
+        <use href="#person" x="122" y="120" class="person on"/>
+        <use href="#person" x="184" y="120" class="person on"/>
+        <use href="#person" x="246" y="120" class="person on"/>
+        <use href="#person" x="60" y="200" class="person on"/>
+        <use href="#person" x="122" y="200" class="person on"/>
+        <use href="#person" x="184" y="200" class="person on"/>
+        <use href="#person" x="246" y="200" class="person on"/>
+        <text x="155" y="266" text-anchor="middle" class="t-s">работают все 8 из 8</text>
+
+        <text x="445" y="32" text-anchor="middle" class="t-l">С распределителем</text>
+        <rect x="310" y="50" width="270" height="230" rx="8" class="room"/>
+        <use href="#person" x="445" y="95" class="person router"/>
+        <use href="#person" x="350" y="160" class="person"/>
+        <use href="#person" x="412" y="160" class="person on"/>
+        <use href="#person" x="474" y="160" class="person"/>
+        <use href="#person" x="536" y="160" class="person"/>
+        <use href="#person" x="350" y="225" class="person"/>
+        <use href="#person" x="412" y="225" class="person"/>
+        <use href="#person" x="474" y="225" class="person"/>
+        <use href="#person" x="536" y="225" class="person on"/>
+        <text x="445" y="266" text-anchor="middle" class="t-s">работают 2 из 8</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide" id="s13">
+  <div class="inner">
+    <div class="copy">
+      <div class="eyebrow">Откуда знания</div>
+      <h2>Как офис учился</h2>
+      <p>Сначала долгая игра. Офису показывают кусок текста из огромной библиотеки и просят угадать следующее слово. Если ошибся, настройки чуть сдвигают. Так триллионы раз. Потом уроки манер: офису показывают примеры хороших ответов и ставят оценки, какой ответ лучше.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 300" role="img" aria-label="Два этапа обучения: угадывание следующего слова по библиотеке и уроки манер с оценкой ответов">
+        <text x="155" y="32" text-anchor="middle" class="t-l">1. Игра в угадайку</text>
+        <rect x="20" y="50" width="270" height="230" rx="8" class="room"/>
+        <rect x="40" y="70" width="16" height="64" rx="2" class="card"/>
+        <rect x="60" y="78" width="16" height="56" rx="2" class="sticky c"/>
+        <rect x="80" y="66" width="16" height="68" rx="2" class="card"/>
+        <rect x="100" y="74" width="16" height="60" rx="2" class="sticky"/>
+        <line x1="34" y1="136" x2="122" y2="136" class="ln"/>
+        <text x="78" y="158" text-anchor="middle" class="t-s mu">библиотека</text>
+        <rect x="136" y="70" width="140" height="60" rx="8" class="card"/>
+        <text x="206" y="98" text-anchor="middle" class="t-s">Кот сидел на</text>
+        <rect x="184" y="106" width="44" height="16" rx="4" class="fill-line"/>
+        <text x="206" y="119" text-anchor="middle" class="t-s wh">?</text>
+        <path d="M206,134 V152" class="arrow"/>
+        <rect x="150" y="158" width="80" height="34" rx="6" class="card-hot"/>
+        <text x="190" y="181" text-anchor="middle" class="t-s on-hot b">окне</text>
+        <path d="M242,176 l8,8 l14,-16" class="check"/>
+        <text x="155" y="230" text-anchor="middle" class="t-s">ошибся: настройки чуть сдвигают</text>
+        <text x="155" y="256" text-anchor="middle" class="t-s mu">повторить триллионы раз</text>
+
+        <text x="445" y="32" text-anchor="middle" class="t-l">2. Уроки манер</text>
+        <rect x="310" y="50" width="270" height="230" rx="8" class="room"/>
+        <rect x="330" y="76" width="110" height="90" rx="8" class="card"/>
+        <text x="385" y="100" text-anchor="middle" class="t-s b">Ответ А</text>
+        <rect x="345" y="114" width="80" height="6" rx="3" class="fill-line"/>
+        <rect x="345" y="128" width="60" height="6" rx="3" class="fill-line"/>
+        <rect x="345" y="142" width="72" height="6" rx="3" class="fill-line"/>
+        <rect x="450" y="76" width="110" height="90" rx="8" class="card"/>
+        <text x="505" y="100" text-anchor="middle" class="t-s b">Ответ Б</text>
+        <rect x="465" y="114" width="80" height="6" rx="3" class="fill-line"/>
+        <rect x="465" y="128" width="40" height="6" rx="3" class="fill-line"/>
+        <path d="M358,190 l8,8 l14,-16" class="check"/>
+        <text x="400" y="198" class="t-s b">лучше</text>
+        <path d="M478,182 l16,16 M494,182 l-16,16" class="cross"/>
+        <text x="520" y="198" class="t-s mu">хуже</text>
+        <text x="445" y="236" text-anchor="middle" class="t-s">оценки ставят люди</text>
+        <text x="445" y="260" text-anchor="middle" class="t-s mu">офис подстраивается под оценки</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" id="s14">
+  <div class="inner" style="grid-template-columns:1fr">
+    <div class="copy">
+      <div class="eyebrow">Ограничения</div>
+      <h2>Что важно помнить</h2>
+    </div>
+    <div class="limits">
+      <div class="lim">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="8" y="12" width="32" height="40" rx="3" class="card"/>
+          <line x1="14" y1="22" x2="34" y2="22" class="ln"/><line x1="14" y1="30" x2="34" y2="30" class="ln"/><line x1="14" y1="38" x2="28" y2="38" class="ln"/>
+          <circle cx="46" cy="46" r="13" class="sticky"/>
+          <path d="M46,38 V46 L52,50" stroke="var(--accent-ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </svg>
+        <b>Знания до даты обучения</b>
+        <span>Что появилось позже, офис не знает, пока ему не дадут поискать в интернете или в документах.</span>
+      </div>
+      <div class="lim">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M10,10 h44 a4,4 0 0 1 4,4 v28 a4,4 0 0 1 -4,4 h-24 l-10,10 v-10 h-10 a4,4 0 0 1 -4,-4 v-28 a4,4 0 0 1 4,-4 z" class="card"/>
+          <rect x="30" y="18" width="4" height="14" rx="2" fill="var(--hot)"/>
+          <circle cx="32" cy="38" r="2.5" fill="var(--hot)"/>
+        </svg>
+        <b>Может уверенно ошибаться</b>
+        <span>Базовая задача офиса: дописать правдоподобный текст. Правдоподобный и верный совпадают не всегда.</span>
+      </div>
+      <div class="lim">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="6" y="30" width="52" height="6" rx="2" class="fill-mu"/>
+          <rect x="12" y="36" width="5" height="20" class="fill-line"/>
+          <rect x="47" y="36" width="5" height="20" class="fill-line"/>
+          <rect x="14" y="18" width="16" height="10" rx="2" class="card"/>
+          <rect x="34" y="18" width="16" height="10" rx="2" class="sticky"/>
+        </svg>
+        <b>Видит только свой стол</b>
+        <span>В работу берут ограниченное число карточек. Что убрали со стола, офис уже не помнит.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide" id="s15">
+  <div class="inner" style="grid-template-columns:1fr">
+    <div class="copy">
+      <div class="eyebrow">Итого</div>
+      <h2>Весь путь на одной картинке</h2>
+      <p>Приёмная режет текст на карточки. В каждой комнате коридора смотрят назад, зовут специалистов и дописывают пометки. На выходе выбирают следующий кусочек, добавляют его к тексту и повторяют.</p>
+    </div>
+    <div class="figure">
+      <svg class="sv" viewBox="0 0 600 240" role="img" aria-label="Сводная схема: приёмная, коридор с тремя действиями, выход, текст, и стрелка повтора">
+        <rect x="20" y="40" width="120" height="120" rx="8" class="room"/>
+        <text x="80" y="64" text-anchor="middle" class="t-s b">Приёмная</text>
+        <rect x="36" y="84" width="26" height="20" rx="3" class="card"/>
+        <rect x="68" y="84" width="26" height="20" rx="3" class="card"/>
+        <rect x="100" y="84" width="26" height="20" rx="3" class="card"/>
+        <text x="80" y="136" text-anchor="middle" class="t-s mu">карточки</text>
+        <path d="M144,100 L158,100" class="arrow"/>
+
+        <rect x="160" y="40" width="120" height="120" rx="8" class="room"/>
+        <text x="220" y="64" text-anchor="middle" class="t-s b">Коридор</text>
+        <circle cx="180" cy="86" r="8" class="badge"/><text x="180" y="90" text-anchor="middle" font-size="11" class="wh">А</text>
+        <text x="194" y="91" class="t-s">назад</text>
+        <circle cx="180" cy="112" r="8" class="badge"/><text x="180" y="116" text-anchor="middle" font-size="11" class="wh">Б</text>
+        <text x="194" y="117" class="t-s">специалисты</text>
+        <circle cx="180" cy="138" r="8" class="badge"/><text x="180" y="142" text-anchor="middle" font-size="11" class="wh">В</text>
+        <text x="194" y="143" class="t-s">пометки</text>
+        <path d="M284,100 L298,100" class="arrow"/>
+
+        <rect x="300" y="40" width="120" height="120" rx="8" class="room"/>
+        <text x="360" y="64" text-anchor="middle" class="t-s b">Выход</text>
+        <rect x="316" y="80" width="88" height="14" rx="3" class="bar on"/>
+        <rect x="316" y="100" width="22" height="14" rx="3" class="bar"/>
+        <rect x="316" y="120" width="12" height="14" rx="3" class="bar"/>
+        <text x="360" y="150" text-anchor="middle" class="t-s mu">список</text>
+        <path d="M424,100 L438,100" class="arrow"/>
+
+        <rect x="440" y="40" width="140" height="120" rx="8" class="room"/>
+        <text x="510" y="64" text-anchor="middle" class="t-s b">Текст</text>
+        <rect x="456" y="84" width="40" height="26" rx="4" class="card"/>
+        <rect x="500" y="84" width="40" height="26" rx="4" class="card"/>
+        <rect x="544" y="84" width="24" height="26" rx="4" class="card-hot"/>
+        <text x="556" y="102" text-anchor="middle" class="t-s on-hot b">+1</text>
+        <text x="510" y="136" text-anchor="middle" class="t-s mu">кусочек добавлен</text>
+
+        <path d="M510,164 V200 H80 V164" class="arrow hot"/>
+        <text x="300" y="224" text-anchor="middle" class="t-s mu">и снова, пока ответ не закончится</text>
+      </svg>
+    </div>
+    <div class="copy">
+      <div class="eyebrow">Источники</div>
+      <ul class="sources">
+        <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need (2017)</a> — внимание и коридор из комнат</li>
+        <li><a href="https://arxiv.org/abs/2401.04088" target="_blank" rel="noopener">Mixtral of Experts (2024)</a> — распределитель и специалисты, цифры 13 из 47 млрд</li>
+        <li><a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noopener">DeepSeek-V3 Technical Report (2024)</a> — цифры 37 из 671 млрд</li>
+        <li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Training language models to follow instructions (2022)</a> — уроки манер</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="nav" role="group" aria-label="Навигация по слайдам">
+  <button type="button" id="prev" aria-label="Предыдущий слайд">&#8593;</button>
+  <span class="count" id="count" aria-live="polite">1 / 15</span>
+  <button type="button" id="next" aria-label="Следующий слайд">&#8595;</button>
+</div>
+
+<script>
+(function(){
+  function grid(id,onCount,half){
+    var g=document.getElementById(id); if(!g) return; var s='';
+    for(var i=0;i<100;i++){
+      var r=Math.floor(i/10),c=i%10,x=c*18,y=r*18,on=i<onCount;
+      s+='<rect x="'+x+'" y="'+y+'" width="14" height="14" rx="2" class="cell'+(on?' on':'')+'"/>';
+      if(half&&i===onCount){ s+='<rect x="'+x+'" y="'+y+'" width="7" height="14" rx="2" class="cell on"/>'; }
+    }
+    g.innerHTML=s;
+  }
+  grid('g-mixtral',28,false);
+  grid('g-deepseek',5,true);
+
+  var deck=document.getElementById('deck');
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var count=document.getElementById('count'), bar=document.getElementById('bar');
+  var prev=document.getElementById('prev'), next=document.getElementById('next');
+  var n=slides.length, cur=0;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function update(){
+    count.textContent=(cur+1)+' / '+n;
+    bar.style.width=((cur+1)/n*100)+'%';
+    prev.disabled=cur===0; next.disabled=cur===n-1;
+  }
+  function go(i,instant){
+    i=Math.max(0,Math.min(n-1,i));
+    slides[i].scrollIntoView({behavior:(instant||reduce)?'auto':'smooth',block:'start'});
+  }
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ cur=slides.indexOf(e.target); update(); } });
+    },{root:deck,threshold:0.55});
+    slides.forEach(function(s){ io.observe(s); });
+  }
+  prev.addEventListener('click',function(){ go(cur-1); });
+  next.addEventListener('click',function(){ go(cur+1); });
+  document.addEventListener('keydown',function(e){
+    if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '){ e.preventDefault(); go(cur+1); }
+    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){ e.preventDefault(); go(cur-1); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(n-1); }
+  });
+  var m=/^#s(\d+)$/.exec(location.hash||'');
+  if(m){ var idx=parseInt(m[1],10)-1; if(idx>0&&idx<n){ cur=idx; go(idx,true); } }
+  update();
+})();
+</script>
+</body>
+</html>
